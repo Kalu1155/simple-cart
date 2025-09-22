@@ -7,6 +7,7 @@ import {
   addDoc,
   doc,
   getDoc,
+  deleteDoc,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -90,12 +91,30 @@ async function loadCart() {
       <div class="card">
         <h3>${name}</h3>
         <p>Price: $${price}</p>
+        <button class="delete-from-cart" data-id="${cartDoc.id}">
+        Delete
+        </button>
       </div>
     `);
     $("#cart-list").append(card);
   }
+  $(".delete-from-cart")
+  .off("click")
+  .on("click", async function (){
+    const cartItemId = $(this).data("id");
+    await deleteFromCart(cartItemId)
+  })
 }
-
+async function deleteFromCart(cartItemId){
+  try{
+    await deleteDoc(doc(db, "cart", cartItemId));
+    // console.log("item deleted from cart", cartItemId)
+    // alert("deleted from cart", cartItemId)
+    loadCart();
+  }catch(error){
+    console.error("erroe deleting item:", error)
+  }
+}
 $(document).ready(function () {
   loadProducts();
   loadCart();
